@@ -1,0 +1,16 @@
+syntax = "proto3";
+package buzzing.checkers.v1;
+
+option go_package = "github.com/buzzing/checkers";
+
+import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+
+// Params 定义了 checkers 模块的参数
+message Params {}
+
+// GenesisState 为 checkers 模块的创世状态
+message GenesisState {
+    // params 定义了模块的所有参数
+    Params params = 1 [(gogoproto.nullable) = false];
+}

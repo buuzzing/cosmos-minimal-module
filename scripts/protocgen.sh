@@ -21,7 +21,7 @@ buf generate --template buf.gen.pulsar.yaml
 
 cd ..
 
-# cp -r github.com/buzzing/checkers/* ./
+cp -r github.com/buzzing/checkers/* ./
 rm -rf api && mkdir api
 mv buzzing/checkers/* ./api
 rm -rf github.com buzzing
