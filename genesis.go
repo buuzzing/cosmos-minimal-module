@@ -9,8 +9,8 @@
 //     导出用于生成当前模块的状态快照
 package checkers
 
-func NewGenesisState() GenesisState {
-	return GenesisState{
+func NewGenesisState() *GenesisState {
+	return &GenesisState{
 		Params: DefaultParams(),
 	}
 }
