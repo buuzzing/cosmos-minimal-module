@@ -15,16 +15,17 @@ import (
 )
 
 // InitGenesis 从创世状态初始化模块
-func (k *Keeper) InitGenesis(ctx context.Context, data *checkers.GenesisState) {
+func (k *Keeper) InitGenesis(ctx context.Context, data *checkers.GenesisState) error {
 	// 初始化模块 Keeper 的 Params
 	// 参见 keeper/keeper.go 中的 Params 字段
 	if err := k.Params.Set(ctx, data.Params); err != nil {
-		panic(err)
+		return err
 	}
 
 	// 初始化模块 Keeper 的 Counter
 	// 参见 keeper/keeper.go 中的 Counter 字段
 	//TODO
+	return nil
 }
 
 // ExportGenesis 将模块状态导出到创世状态
