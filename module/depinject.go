@@ -31,6 +31,7 @@ func (am AppModule) IsAppModule() {}
 // &modulev1.Module{} 是模块的配置信息，描述模块的基础信息
 // appmodule.Provide(ProvideModule) 是模块的依赖注入函数，指定依赖提供者函数 ProvideModule
 // ProvideModule 用于实例化模块的核心组件并返回
+// 应用通过对 module 的匿名导入，执行该 init 函数，实现模块的注册
 func init() {
 	appmodule.Register(
 		&modulev1.Module{},

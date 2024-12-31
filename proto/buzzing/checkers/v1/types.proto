@@ -13,4 +13,24 @@ message Params {}
 message GenesisState {
     // params 定义了模块的所有参数
     Params params = 1 [(gogoproto.nullable) = false];
+    // indexedStoredGameList 定义了所有的 StoredGame
+    repeated IndexedStoredGame indexedStoredGameList = 2 [(gogoproto.nullable) = false];
+}
+
+// StoredGame 为一局游戏进行到某一步时的状态
+message StoredGame {
+    // board 定义了棋盘的状态，由规则文件(rules/checkers.go)序列化
+    string board = 1;
+    // turn 定义了当前回合的玩家
+    string turn = 2;
+    // black 定义了黑方玩家的地址
+    string black = 3 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+    // red 定义了红方玩家的地址
+    string red = 4 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}
+
+// IndexedStoredGame 为 StoredGame 的包装，用于索引
+message IndexedStoredGame {
+    string index = 1;
+    StoredGame storedGame = 2 [(gogoproto.nullable) = false];
 }

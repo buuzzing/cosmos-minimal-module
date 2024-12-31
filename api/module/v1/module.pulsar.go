@@ -446,15 +446,16 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Module is the app config object of the module.
-// Learn more: https://docs.cosmos.network/main/building-modules/depinject
+// 在构建模块时，message Module 作为模块描述文件
+// 这里定义了模块的配置信息和一些其他的元数据
+// 这些配置项会被 cosmos SDK 的依赖注入框架（depinject）使用，用于初始化和运行模块
 type Module struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	// authority defines the custom module authority.
-	// if not set, defaults to the governance module.
+	// 模块的一个配置字段，记录了允许执行某些高权限操作的账户地址
+	// 如果没有设置，默认为治理模块
 	Authority string `protobuf:"bytes,1,opt,name=authority,proto3" json:"authority,omitempty"`
 }
 
