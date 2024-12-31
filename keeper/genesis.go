@@ -22,9 +22,14 @@ func (k *Keeper) InitGenesis(ctx context.Context, data *checkers.GenesisState) e
 		return err
 	}
 
-	// 初始化模块 Keeper 的 Counter
-	// 参见 keeper/keeper.go 中的 Counter 字段
-	//TODO
+	// 初始化模块 Keeper 的 StoredGame
+	// 参见 keeper/keeper.go 中的 StoredGame 字段
+	for _, indexedStoredGame := range data.IndexedStoredGameList {
+		if err := k.StoredGames.Set(ctx, indexedStoredGame.Index, indexedStoredGame.StoredGame); err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 
@@ -35,8 +40,23 @@ func (k *Keeper) ExportGenesis(ctx context.Context) (*checkers.GenesisState, err
 		return nil, err
 	}
 
+	var indexedStoredGames []checkers.IndexedStoredGame
+	// 遍历所有的 StoredGame
+	// collections.Map 中的 Walk 方法用于遍历 Map，每一个元素都会调用回调函数，并传入反序列化后的 key 和 value
+	// 如果回调函数返回 true，则停止遍历
+	// range 为 nil 时，遍历所有元素
+	if err := k.StoredGames.Walk(ctx, nil, func(index string, storedGame checkers.StoredGame) (bool, error) {
+		indexedStoredGames = append(indexedStoredGames, checkers.IndexedStoredGame{
+			Index:      index,
+			StoredGame: storedGame,
+		})
+		return false, nil
+	}); err != nil {
+		return nil, err
+	}
+
 	return &checkers.GenesisState{
-		Params: params,
-		//TODO
+		Params:                params,
+		IndexedStoredGameList: indexedStoredGames,
 	}, nil
 }

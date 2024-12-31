@@ -46,6 +46,11 @@ type Keeper struct {
 	// Params 用于存储模块的配置参数
 	// collections.Item 是一种用于存储单一值的类型，本质上是一个 noKey 的 Map
 	Params collections.Item[checkers.Params]
+	// StoredGames 用于存储游戏数据
+	// collections.Map 是一种映射类型，用于存储键值对
+	// 它提供了一组方法来操作键值对，例如 Set、Get、Has、Remove 等
+	// 因为 collections.Item 是一个 noKey 的 Map，它重写了 Set, Get 等方法，数据操作与 Map 类似
+	StoredGames collections.Map[string, checkers.StoredGame]
 }
 
 // NewKeeper 创建一个新的 Keeper 实例
@@ -76,13 +81,23 @@ func NewKeeper(cdc codec.BinaryCodec, addressCodec address.Codec, storeService s
 	//   - 读取值: params.Get(ctx) 返回 checkers.Params
 	//     底层通过 cdc 将 bytes 解码为 checkers.Params
 	params := collections.NewItem(sb, checkers.ParamsKey, "params", codec.CollValue[checkers.Params](cdc))
+	// 创建一个内涵类型为 string->checkers.StoredGame 的 collections.Map
+	// collections.StringKey 指定键类型和编码规则
+	// codec.CollValue[checkers.StoredGame](cdc) 指定值类型和编码规则，泛型参数为 checkers.StoredGame
+	// collections.NewMap 返回一个 collections.Map 实例，它的使用方法为:
+	//   - 存储值: storedGames.Set(ctx, key, checkers.StoredGame{...})
+	//     底层通过 cdc 将 checkers.StoredGame 编码为 bytes
+	//   - 读取值: storedGames.Get(ctx, key) 返回 checkers.StoredGame
+	//     底层通过 cdc 将 bytes 解码为 checkers.StoredGame
+	storedGames := collections.NewMap(sb, checkers.StoredGamesKey, "storedGames", collections.StringKey, codec.CollValue[checkers.StoredGame](cdc))
 
 	k := Keeper{
 		cdc:          cdc,
 		addressCodec: addressCodec,
 		authority:    authority,
 
-		Params: params,
+		Params:      params,
+		StoredGames: storedGames,
 	}
 
 	// 通过 SchemaBuilder 构建模块的存储架构
@@ -99,6 +114,6 @@ func NewKeeper(cdc codec.BinaryCodec, addressCodec address.Codec, storeService s
 }
 
 // GetAuthority 返回模块的权限账户地址
-func (k Keeper) GetAuthority() string {
+func (k *Keeper) GetAuthority() string {
 	return k.authority
 }
