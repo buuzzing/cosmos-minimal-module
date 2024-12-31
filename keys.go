@@ -11,6 +11,9 @@ import "cosmossdk.io/collections"
 
 const ModuleName = "checkers"
 
+// MaxIndexLength 定义游戏状态索引的最大长度
+const MaxIndexLength = 256
+
 var (
 	ParamsKey = collections.NewPrefix("Params")
 )

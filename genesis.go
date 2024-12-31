@@ -20,5 +20,23 @@ func (gs *GenesisState) Validate() error {
 		return err
 	}
 
+	// 验证创世状态中的所有游戏状态
+	unique := make(map[string]bool)
+	for _, indexedStoredGame := range gs.IndexedStoredGameList {
+		// 索引长度验证
+		if length := len([]byte(indexedStoredGame.Index)); length < 1 || length > MaxIndexLength {
+			return ErrIndexTooLong
+		}
+		// 索引唯一性验证
+		if _, ok := unique[indexedStoredGame.Index]; ok {
+			return ErrDuplicateAddress
+		}
+		// 游戏状态验证
+		if err := indexedStoredGame.StoredGame.Validate(); err != nil {
+			return err
+		}
+		unique[indexedStoredGame.Index] = true
+	}
+
 	return nil
 }
