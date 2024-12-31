@@ -1,0 +1,36 @@
+// tx.proto 文件定义了通过交易发送的消息
+// 用户通过交易/消息在链上执行操作，例如创建新的游戏或是进行游戏中的操作
+syntax = "proto3";
+package buzzing.checkers.v1;
+
+option go_package = "github.com/buzzing/checkers";
+
+import "cosmos/msg/v1/msg.proto";
+import "gogoproto/gogo.proto";
+import "buzzing/checkers/v1/types.proto";
+import "cosmos_proto/cosmos.proto";
+
+// service 定义了一组可以被远程调用的接口，使用 RPC 机制
+service Msg {
+    option (cosmos.msg.v1.service) = true;
+
+    // rpc 服务的方法名，参数和返回值
+    rpc CreateGame(MsgCreateGame)
+        returns (MsgCreateGameResponse);
+}
+
+// MsgCreateGame 定义了创建游戏的消息
+// 参见 types.proto 中的 StoredGame消息，这里没有传入 Board 和 Turn
+// 因为这些内容不应受到用户的控制，而是由链上的逻辑来决定
+message MsgCreateGame {
+    option (cosmos.msg.v1.signer) = "creator";
+
+    // 创建者是消息发送者
+    string creator = 1;
+    string index = 2;
+    string black = 3 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+    string red = 4 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+}
+
+// MsgCreateGameResponse 定义了创建游戏的响应
+message MsgCreateGameResponse {}

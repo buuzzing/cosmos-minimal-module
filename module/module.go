@@ -82,7 +82,14 @@ func (AppModule) ConsensusVersion() uint64 {
 // RegisterServices 注册模块的 gRPC 服务
 // 例如消息处理 MsgServer 和查询服务 QueryServer
 // 通过模块的 Keeper 实现服务的具体逻辑
-func (am AppModule) RegisterServices(cfg module.Configurator) {}
+func (am AppModule) RegisterServices(cfg module.Configurator) {
+	// proto 中定义的服务接口 service Msg 生成方法 RegisterMsgServer
+	// 用于负责将实现绑定到 gRPC 服务注册器
+	// 在 keeper 包中实现了具体的 MsgServer，参见 keeper/msg_server.go
+	// keeper.NewMsgServerImpl(am.keeper) 返回实现了 proto 中定义的 MsgServer 接口的对象
+	// 通过 RegisterMsgServer 将其绑定到 gRPC 服务注册器
+	checkers.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
+}
 
 // DefaultGenesis 返回默认的创世状态，并进行序列化
 func (am AppModule) DefaultGenesis(cdc codec.JSONCodec) json.RawMessage {
