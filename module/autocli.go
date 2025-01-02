@@ -5,6 +5,7 @@ package module
 
 import (
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
+	checkersv1 "github.com/buzzing/checkers/api/v1"
 )
 
 // AutoCLIOptions 实现 autocli.HasAutoCLIConfig 接口
@@ -12,6 +13,30 @@ import (
 func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 	return &autocliv1.ModuleOptions{
 		Query: nil,
-		Tx:    nil,
+		Tx: &autocliv1.ServiceCommandDescriptor{
+			// Service 模块消息服务的 gRPC 名称
+			Service: checkersv1.Msg_ServiceDesc.ServiceName,
+			// RpcCommandOptions 指定了该服务中所有支持的 RPC 方法的 CLI 命令选项
+			RpcCommandOptions: []*autocliv1.RpcCommandOptions{
+				{
+					// RpcMethod 指定了 gRPC 服务中的方法名称
+					RpcMethod: "CreateGame",
+					// Use 指定命令的使用方法
+					// index black red 为所需的参数
+					Use: "create index black red",
+					// Short 指定了命令的简短描述
+					Short: "Creates a new checkers game at the index for the black and red players",
+					// PositionalArgs 定义命令的参数及其顺序
+					// 每个参数通过 ProtoField 指定其对应的字段
+					// proto 文件中定义的 CreateGame 方法参数为 MsgCreateGame (参见 tx.proto)
+					// 其 MsgCreateGame 需要 index, black, red 三个参数
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
+						{ProtoField: "index"},
+						{ProtoField: "black"},
+						{ProtoField: "red"},
+					},
+				},
+			},
+		},
 	}
 }
