@@ -12,7 +12,21 @@ import (
 // 返回内容 *autocliv1.ModuleOptions 描述了模块的 CLI 配置
 func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 	return &autocliv1.ModuleOptions{
-		Query: nil,
+		Query: &autocliv1.ServiceCommandDescriptor{
+			RpcCommandOptions: []*autocliv1.RpcCommandOptions{
+				{
+					RpcMethod: "GetGame",
+					// index 为所需的参数
+					Use:   "get-game index",
+					Short: "Get the current value of the game at the index",
+					// proto 文件中定义的 GetGame 方法参数为 QueryGetGameRequest (参见 query.proto)
+					// 其 QueryGetGameRequest 需要 index 参数
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
+						{ProtoField: "index"},
+					},
+				},
+			},
+		},
 		Tx: &autocliv1.ServiceCommandDescriptor{
 			// Service 模块消息服务的 gRPC 名称
 			Service: checkersv1.Msg_ServiceDesc.ServiceName,

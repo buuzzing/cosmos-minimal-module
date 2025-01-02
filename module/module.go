@@ -4,6 +4,7 @@
 package module
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 
@@ -64,10 +65,22 @@ func (AppModule) Name() string {
 // 在现代模块中留空即可
 func (AppModule) RegisterLegacyAminoCodec(*codec.LegacyAmino) {}
 
-// RegisterGRPCGatewayRoutes 注册模块的 gRPC 网关路由，暴露 RESTful 接口
+// RegisterGRPCGatewayRoutes 注册模块的 gRPC 网关路由，暴露 REST 接口，为 HTTP 客户端提供支持
 // clientCtx 为客户端上下文，用于构造查询客户端
 // mux 为 gRPC Gateway 的路由器，用于注册 REST 路由服务
-func (AppModule) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *gwruntime.ServeMux) {}
+// gRPC Gateway 可以将 HTTP 请求转换为 gRPC 请求
+// 通过将 gRPC 服务注册到 mux 中，使得 gRPC 服务可以通过 HTTP 访问
+func (AppModule) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *gwruntime.ServeMux) {
+	// 对比于 MsgServer，消息的作用是修改状态，通过交易的方式广播到链上
+	// 消息的入口是通过交易广播的，而不是直接通过 HTTP 或 gRPC 接口访问
+	// QueryServer 查询是只读操作，支持 HTTP 和 gRPC 接口访问
+	// 因此消息不需要 gRPC Gateway，只需要注册 QueryServer
+
+	// checkers.RegisterQueryHandlerClient 将 gRPC 的查询接口转换为 REST API
+	if err := checkers.RegisterQueryHandlerClient(context.Background(), mux, checkers.NewQueryClient(clientCtx)); err != nil {
+		panic(err)
+	}
+}
 
 // RegisterInterfaces 注册模块的接口
 func (AppModule) RegisterInterfaces(registry codectypes.InterfaceRegistry) {
@@ -79,7 +92,7 @@ func (AppModule) ConsensusVersion() uint64 {
 	return ConsensusVersion
 }
 
-// RegisterServices 注册模块的 gRPC 服务
+// RegisterServices 注册模块的 gRPC 服务，仅为 gRPC 服务提供支持
 // 例如消息处理 MsgServer 和查询服务 QueryServer
 // 通过模块的 Keeper 实现服务的具体逻辑
 func (am AppModule) RegisterServices(cfg module.Configurator) {
@@ -89,6 +102,10 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 	// keeper.NewMsgServerImpl(am.keeper) 返回实现了 proto 中定义的 MsgServer 接口的对象
 	// 通过 RegisterMsgServer 将其绑定到 gRPC 服务注册器
 	checkers.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
+	// 同理在 keeper 包中实现了具体的 QueryServer，参见 keeper/query_server.go
+	// keeper.NewQueryServerImpl(am.keeper) 返回实现了 proto 中定义的 QueryServer 接口的对象
+	// 通过 RegisterQueryServer 将其绑定到 gRPC 服务注册器
+	checkers.RegisterQueryServer(cfg.QueryServer(), keeper.NewQueryServerImpl(am.keeper))
 }
 
 // DefaultGenesis 返回默认的创世状态，并进行序列化

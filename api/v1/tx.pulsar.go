@@ -1000,7 +1000,7 @@ const (
 )
 
 // MsgCreateGame 定义了创建游戏的消息
-// 参见 types.proto 中的 StoredGame消息，这里没有传入 Board 和 Turn
+// 参见 types.proto 中的 StoredGame 消息，这里没有传入 Board 和 Turn
 // 因为这些内容不应受到用户的控制，而是由链上的逻辑来决定
 type MsgCreateGame struct {
 	state         protoimpl.MessageState
