@@ -21,7 +21,8 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	Query_GetGame_FullMethodName = "/buzzing.checkers.v1.Query/GetGame"
+	Query_GetGame_FullMethodName       = "/buzzing.checkers.v1.Query/GetGame"
+	Query_GetRecordList_FullMethodName = "/buzzing.checkers.v1.Query/GetRecordList"
 )
 
 // QueryClient is the client API for Query service.
@@ -30,6 +31,7 @@ const (
 type QueryClient interface {
 	// rpc 服务的方法名，参数和返回值
 	GetGame(ctx context.Context, in *QueryGetGameRequest, opts ...grpc.CallOption) (*QueryGetGameResponse, error)
+	GetRecordList(ctx context.Context, in *QueryGetRecordListRequest, opts ...grpc.CallOption) (*QueryGetRecordListResponse, error)
 }
 
 type queryClient struct {
@@ -49,12 +51,22 @@ func (c *queryClient) GetGame(ctx context.Context, in *QueryGetGameRequest, opts
 	return out, nil
 }
 
+func (c *queryClient) GetRecordList(ctx context.Context, in *QueryGetRecordListRequest, opts ...grpc.CallOption) (*QueryGetRecordListResponse, error) {
+	out := new(QueryGetRecordListResponse)
+	err := c.cc.Invoke(ctx, Query_GetRecordList_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // QueryServer is the server API for Query service.
 // All implementations must embed UnimplementedQueryServer
 // for forward compatibility
 type QueryServer interface {
 	// rpc 服务的方法名，参数和返回值
 	GetGame(context.Context, *QueryGetGameRequest) (*QueryGetGameResponse, error)
+	GetRecordList(context.Context, *QueryGetRecordListRequest) (*QueryGetRecordListResponse, error)
 	mustEmbedUnimplementedQueryServer()
 }
 
@@ -64,6 +76,9 @@ type UnimplementedQueryServer struct {
 
 func (UnimplementedQueryServer) GetGame(context.Context, *QueryGetGameRequest) (*QueryGetGameResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetGame not implemented")
+}
+func (UnimplementedQueryServer) GetRecordList(context.Context, *QueryGetRecordListRequest) (*QueryGetRecordListResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetRecordList not implemented")
 }
 func (UnimplementedQueryServer) mustEmbedUnimplementedQueryServer() {}
 
@@ -96,6 +111,24 @@ func _Query_GetGame_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Query_GetRecordList_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(QueryGetRecordListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(QueryServer).GetRecordList(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Query_GetRecordList_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(QueryServer).GetRecordList(ctx, req.(*QueryGetRecordListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Query_ServiceDesc is the grpc.ServiceDesc for Query service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -106,6 +139,10 @@ var Query_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetGame",
 			Handler:    _Query_GetGame_Handler,
+		},
+		{
+			MethodName: "GetRecordList",
+			Handler:    _Query_GetRecordList_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

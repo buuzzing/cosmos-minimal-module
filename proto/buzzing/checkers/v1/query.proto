@@ -23,6 +23,9 @@ service Query {
         option (google.api.http).get =
             "/buzzing/checkers/v1/game/{index}";
     }
+
+    rpc GetRecordList(QueryGetRecordListRequest)
+        returns (QueryGetRecordListResponse);
 }
 
 // QueryGetGameRequest 是查询游戏状态的请求消息
@@ -35,4 +38,10 @@ message QueryGetGameRequest {
 message QueryGetGameResponse {
     // Game 是查询到的游戏状态
     StoredGame Game = 1;
+}
+
+message QueryGetRecordListRequest {}
+
+message QueryGetRecordListResponse {
+    repeated string records = 1;
 }

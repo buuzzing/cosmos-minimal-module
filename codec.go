@@ -25,6 +25,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 	// 使得框架能够识别和处理 MsgCreateGame 这个类型
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgCreateGame{},
+		&MsgAddRecord{},
 	)
 	// cosmos SDK 使用接口注册机制来处理多态类型
 	// 通过注册接口和具体实现的关系，使得框架能够正确地序列化和反序列化这些类型

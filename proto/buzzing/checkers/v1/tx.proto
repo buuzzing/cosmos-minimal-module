@@ -17,6 +17,9 @@ service Msg {
     // rpc 服务的方法名，参数和返回值
     rpc CreateGame(MsgCreateGame)
         returns (MsgCreateGameResponse);
+
+    rpc AddRecord(MsgAddRecord)
+        returns (MsgAddRecordResponse);
 }
 
 // MsgCreateGame 定义了创建游戏的消息
@@ -34,3 +37,14 @@ message MsgCreateGame {
 
 // MsgCreateGameResponse 定义了创建游戏的响应
 message MsgCreateGameResponse {}
+
+// MsgAddRecord 定义添加 record 字段的消息
+message MsgAddRecord {
+    option (cosmos.msg.v1.signer) = "creator";
+
+    string creator = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+    string value = 2;
+}
+
+// MsgAddRecordResponse 定义了添加 record 字段的响应
+message MsgAddRecordResponse {}

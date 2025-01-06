@@ -23,6 +23,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	Msg_CreateGame_FullMethodName = "/buzzing.checkers.v1.Msg/CreateGame"
+	Msg_AddRecord_FullMethodName  = "/buzzing.checkers.v1.Msg/AddRecord"
 )
 
 // MsgClient is the client API for Msg service.
@@ -31,6 +32,7 @@ const (
 type MsgClient interface {
 	// rpc 服务的方法名，参数和返回值
 	CreateGame(ctx context.Context, in *MsgCreateGame, opts ...grpc.CallOption) (*MsgCreateGameResponse, error)
+	AddRecord(ctx context.Context, in *MsgAddRecord, opts ...grpc.CallOption) (*MsgAddRecordResponse, error)
 }
 
 type msgClient struct {
@@ -50,12 +52,22 @@ func (c *msgClient) CreateGame(ctx context.Context, in *MsgCreateGame, opts ...g
 	return out, nil
 }
 
+func (c *msgClient) AddRecord(ctx context.Context, in *MsgAddRecord, opts ...grpc.CallOption) (*MsgAddRecordResponse, error) {
+	out := new(MsgAddRecordResponse)
+	err := c.cc.Invoke(ctx, Msg_AddRecord_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 // All implementations must embed UnimplementedMsgServer
 // for forward compatibility
 type MsgServer interface {
 	// rpc 服务的方法名，参数和返回值
 	CreateGame(context.Context, *MsgCreateGame) (*MsgCreateGameResponse, error)
+	AddRecord(context.Context, *MsgAddRecord) (*MsgAddRecordResponse, error)
 	mustEmbedUnimplementedMsgServer()
 }
 
@@ -65,6 +77,9 @@ type UnimplementedMsgServer struct {
 
 func (UnimplementedMsgServer) CreateGame(context.Context, *MsgCreateGame) (*MsgCreateGameResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateGame not implemented")
+}
+func (UnimplementedMsgServer) AddRecord(context.Context, *MsgAddRecord) (*MsgAddRecordResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddRecord not implemented")
 }
 func (UnimplementedMsgServer) mustEmbedUnimplementedMsgServer() {}
 
@@ -97,6 +112,24 @@ func _Msg_CreateGame_Handler(srv interface{}, ctx context.Context, dec func(inte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_AddRecord_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgAddRecord)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).AddRecord(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Msg_AddRecord_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).AddRecord(ctx, req.(*MsgAddRecord))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // Msg_ServiceDesc is the grpc.ServiceDesc for Msg service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -107,6 +140,10 @@ var Msg_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateGame",
 			Handler:    _Msg_CreateGame_Handler,
+		},
+		{
+			MethodName: "AddRecord",
+			Handler:    _Msg_AddRecord_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -51,6 +51,9 @@ type Keeper struct {
 	// 它提供了一组方法来操作键值对，例如 Set、Get、Has、Remove 等
 	// 因为 collections.Item 是一个 noKey 的 Map，它重写了 Set, Get 等方法，数据操作与 Map 类似
 	StoredGames collections.Map[string, checkers.StoredGame]
+
+	// 用于测试 BeginBlocker 函数的测试字段
+	RecordList collections.KeySet[string]
 }
 
 // NewKeeper 创建一个新的 Keeper 实例
@@ -91,6 +94,8 @@ func NewKeeper(cdc codec.BinaryCodec, addressCodec address.Codec, storeService s
 	//     底层通过 cdc 将 bytes 解码为 checkers.StoredGame
 	storedGames := collections.NewMap(sb, checkers.StoredGamesKey, "storedGames", collections.StringKey, codec.CollValue[checkers.StoredGame](cdc))
 
+	recordList := collections.NewKeySet(sb, checkers.RecordKey, "RecordList", collections.StringKey)
+
 	k := Keeper{
 		cdc:          cdc,
 		addressCodec: addressCodec,
@@ -98,6 +103,7 @@ func NewKeeper(cdc codec.BinaryCodec, addressCodec address.Codec, storeService s
 
 		Params:      params,
 		StoredGames: storedGames,
+		RecordList:  recordList,
 	}
 
 	// 通过 SchemaBuilder 构建模块的存储架构

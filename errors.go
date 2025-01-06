@@ -9,3 +9,7 @@ var (
 	ErrInvalidRed       = errors.Register(ModuleName, 5, "red address is invalid: %s")
 	ErrGameNotParseable = errors.Register(ModuleName, 6, "game cannot be parsed")
 )
+
+var (
+	ErrRecordListSpecified = errors.Register(ModuleName, 7, "record list specified")
+)

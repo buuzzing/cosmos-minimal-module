@@ -13,6 +13,7 @@ import (
 func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 	return &autocliv1.ModuleOptions{
 		Query: &autocliv1.ServiceCommandDescriptor{
+			Service: checkersv1.Query_ServiceDesc.ServiceName,
 			RpcCommandOptions: []*autocliv1.RpcCommandOptions{
 				{
 					RpcMethod: "GetGame",
@@ -24,6 +25,11 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
 						{ProtoField: "index"},
 					},
+				},
+				{
+					RpcMethod: "GetRecordList",
+					Use:       "get-record-list",
+					Short:     "Get the list of records",
 				},
 			},
 		},
@@ -48,6 +54,14 @@ func (am AppModule) AutoCLIOptions() *autocliv1.ModuleOptions {
 						{ProtoField: "index"},
 						{ProtoField: "black"},
 						{ProtoField: "red"},
+					},
+				},
+				{
+					RpcMethod: "AddRecord",
+					Use:       "add-record record_value",
+					Short:     "Add a record to the chain storage",
+					PositionalArgs: []*autocliv1.PositionalArgDescriptor{
+						{ProtoField: "value"},
 					},
 				},
 			},

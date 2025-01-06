@@ -41,3 +41,17 @@ func (qs queryServer) GetGame(ctx context.Context, req *checkers.QueryGetGameReq
 	// 否则返回错误
 	return nil, status.Error(codes.Internal, err.Error())
 }
+
+// GetRecordList QueryGetRecordRequest 消息的 handler，获取全部记录内容
+func (qs queryServer) GetRecordList(ctx context.Context, req *checkers.QueryGetRecordListRequest) (*checkers.QueryGetRecordListResponse, error) {
+	var recordList []string
+
+	if err := qs.k.RecordList.Walk(ctx, nil, func(record string) (bool, error) {
+		recordList = append(recordList, record)
+		return false, nil
+	}); err != nil {
+		return nil, err
+	}
+
+	return &checkers.QueryGetRecordListResponse{Records: recordList}, nil
+}

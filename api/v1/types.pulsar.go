@@ -421,10 +421,57 @@ func (x *_GenesisState_2_list) IsValid() bool {
 	return x.list != nil
 }
 
+var _ protoreflect.List = (*_GenesisState_3_list)(nil)
+
+type _GenesisState_3_list struct {
+	list *[]string
+}
+
+func (x *_GenesisState_3_list) Len() int {
+	if x.list == nil {
+		return 0
+	}
+	return len(*x.list)
+}
+
+func (x *_GenesisState_3_list) Get(i int) protoreflect.Value {
+	return protoreflect.ValueOfString((*x.list)[i])
+}
+
+func (x *_GenesisState_3_list) Set(i int, value protoreflect.Value) {
+	valueUnwrapped := value.String()
+	concreteValue := valueUnwrapped
+	(*x.list)[i] = concreteValue
+}
+
+func (x *_GenesisState_3_list) Append(value protoreflect.Value) {
+	valueUnwrapped := value.String()
+	concreteValue := valueUnwrapped
+	*x.list = append(*x.list, concreteValue)
+}
+
+func (x *_GenesisState_3_list) AppendMutable() protoreflect.Value {
+	panic(fmt.Errorf("AppendMutable can not be called on message GenesisState at list field RecordList as it is not of Message kind"))
+}
+
+func (x *_GenesisState_3_list) Truncate(n int) {
+	*x.list = (*x.list)[:n]
+}
+
+func (x *_GenesisState_3_list) NewElement() protoreflect.Value {
+	v := ""
+	return protoreflect.ValueOfString(v)
+}
+
+func (x *_GenesisState_3_list) IsValid() bool {
+	return x.list != nil
+}
+
 var (
 	md_GenesisState                       protoreflect.MessageDescriptor
 	fd_GenesisState_params                protoreflect.FieldDescriptor
 	fd_GenesisState_indexedStoredGameList protoreflect.FieldDescriptor
+	fd_GenesisState_recordList            protoreflect.FieldDescriptor
 )
 
 func init() {
@@ -432,6 +479,7 @@ func init() {
 	md_GenesisState = File_buzzing_checkers_v1_types_proto.Messages().ByName("GenesisState")
 	fd_GenesisState_params = md_GenesisState.Fields().ByName("params")
 	fd_GenesisState_indexedStoredGameList = md_GenesisState.Fields().ByName("indexedStoredGameList")
+	fd_GenesisState_recordList = md_GenesisState.Fields().ByName("recordList")
 }
 
 var _ protoreflect.Message = (*fastReflection_GenesisState)(nil)
@@ -511,6 +559,12 @@ func (x *fastReflection_GenesisState) Range(f func(protoreflect.FieldDescriptor,
 			return
 		}
 	}
+	if len(x.RecordList) != 0 {
+		value := protoreflect.ValueOfList(&_GenesisState_3_list{list: &x.RecordList})
+		if !f(fd_GenesisState_recordList, value) {
+			return
+		}
+	}
 }
 
 // Has reports whether a field is populated.
@@ -530,6 +584,8 @@ func (x *fastReflection_GenesisState) Has(fd protoreflect.FieldDescriptor) bool 
 		return x.Params != nil
 	case "buzzing.checkers.v1.GenesisState.indexedStoredGameList":
 		return len(x.IndexedStoredGameList) != 0
+	case "buzzing.checkers.v1.GenesisState.recordList":
+		return len(x.RecordList) != 0
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: buzzing.checkers.v1.GenesisState"))
@@ -550,6 +606,8 @@ func (x *fastReflection_GenesisState) Clear(fd protoreflect.FieldDescriptor) {
 		x.Params = nil
 	case "buzzing.checkers.v1.GenesisState.indexedStoredGameList":
 		x.IndexedStoredGameList = nil
+	case "buzzing.checkers.v1.GenesisState.recordList":
+		x.RecordList = nil
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: buzzing.checkers.v1.GenesisState"))
@@ -574,6 +632,12 @@ func (x *fastReflection_GenesisState) Get(descriptor protoreflect.FieldDescripto
 			return protoreflect.ValueOfList(&_GenesisState_2_list{})
 		}
 		listValue := &_GenesisState_2_list{list: &x.IndexedStoredGameList}
+		return protoreflect.ValueOfList(listValue)
+	case "buzzing.checkers.v1.GenesisState.recordList":
+		if len(x.RecordList) == 0 {
+			return protoreflect.ValueOfList(&_GenesisState_3_list{})
+		}
+		listValue := &_GenesisState_3_list{list: &x.RecordList}
 		return protoreflect.ValueOfList(listValue)
 	default:
 		if descriptor.IsExtension() {
@@ -601,6 +665,10 @@ func (x *fastReflection_GenesisState) Set(fd protoreflect.FieldDescriptor, value
 		lv := value.List()
 		clv := lv.(*_GenesisState_2_list)
 		x.IndexedStoredGameList = *clv.list
+	case "buzzing.checkers.v1.GenesisState.recordList":
+		lv := value.List()
+		clv := lv.(*_GenesisState_3_list)
+		x.RecordList = *clv.list
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: buzzing.checkers.v1.GenesisState"))
@@ -632,6 +700,12 @@ func (x *fastReflection_GenesisState) Mutable(fd protoreflect.FieldDescriptor) p
 		}
 		value := &_GenesisState_2_list{list: &x.IndexedStoredGameList}
 		return protoreflect.ValueOfList(value)
+	case "buzzing.checkers.v1.GenesisState.recordList":
+		if x.RecordList == nil {
+			x.RecordList = []string{}
+		}
+		value := &_GenesisState_3_list{list: &x.RecordList}
+		return protoreflect.ValueOfList(value)
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: buzzing.checkers.v1.GenesisState"))
@@ -651,6 +725,9 @@ func (x *fastReflection_GenesisState) NewField(fd protoreflect.FieldDescriptor) 
 	case "buzzing.checkers.v1.GenesisState.indexedStoredGameList":
 		list := []*IndexedStoredGame{}
 		return protoreflect.ValueOfList(&_GenesisState_2_list{list: &list})
+	case "buzzing.checkers.v1.GenesisState.recordList":
+		list := []string{}
+		return protoreflect.ValueOfList(&_GenesisState_3_list{list: &list})
 	default:
 		if fd.IsExtension() {
 			panic(fmt.Errorf("proto3 declared messages do not support extensions: buzzing.checkers.v1.GenesisState"))
@@ -730,6 +807,12 @@ func (x *fastReflection_GenesisState) ProtoMethods() *protoiface.Methods {
 				n += 1 + l + runtime.Sov(uint64(l))
 			}
 		}
+		if len(x.RecordList) > 0 {
+			for _, s := range x.RecordList {
+				l = len(s)
+				n += 1 + l + runtime.Sov(uint64(l))
+			}
+		}
 		if x.unknownFields != nil {
 			n += len(x.unknownFields)
 		}
@@ -758,6 +841,15 @@ func (x *fastReflection_GenesisState) ProtoMethods() *protoiface.Methods {
 		if x.unknownFields != nil {
 			i -= len(x.unknownFields)
 			copy(dAtA[i:], x.unknownFields)
+		}
+		if len(x.RecordList) > 0 {
+			for iNdEx := len(x.RecordList) - 1; iNdEx >= 0; iNdEx-- {
+				i -= len(x.RecordList[iNdEx])
+				copy(dAtA[i:], x.RecordList[iNdEx])
+				i = runtime.EncodeVarint(dAtA, i, uint64(len(x.RecordList[iNdEx])))
+				i--
+				dAtA[i] = 0x1a
+			}
 		}
 		if len(x.IndexedStoredGameList) > 0 {
 			for iNdEx := len(x.IndexedStoredGameList) - 1; iNdEx >= 0; iNdEx-- {
@@ -907,6 +999,38 @@ func (x *fastReflection_GenesisState) ProtoMethods() *protoiface.Methods {
 				if err := options.Unmarshal(dAtA[iNdEx:postIndex], x.IndexedStoredGameList[len(x.IndexedStoredGameList)-1]); err != nil {
 					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, err
 				}
+				iNdEx = postIndex
+			case 3:
+				if wireType != 2 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, fmt.Errorf("proto: wrong wireType = %d for field RecordList", wireType)
+				}
+				var stringLen uint64
+				for shift := uint(0); ; shift += 7 {
+					if shift >= 64 {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrIntOverflow
+					}
+					if iNdEx >= l {
+						return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+					}
+					b := dAtA[iNdEx]
+					iNdEx++
+					stringLen |= uint64(b&0x7F) << shift
+					if b < 0x80 {
+						break
+					}
+				}
+				intStringLen := int(stringLen)
+				if intStringLen < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				postIndex := iNdEx + intStringLen
+				if postIndex < 0 {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, runtime.ErrInvalidLength
+				}
+				if postIndex > l {
+					return protoiface.UnmarshalOutput{NoUnkeyedLiterals: input.NoUnkeyedLiterals, Flags: input.Flags}, io.ErrUnexpectedEOF
+				}
+				x.RecordList = append(x.RecordList, string(dAtA[iNdEx:postIndex]))
 				iNdEx = postIndex
 			default:
 				iNdEx = preIndex
@@ -2104,6 +2228,8 @@ type GenesisState struct {
 	Params *Params `protobuf:"bytes,1,opt,name=params,proto3" json:"params,omitempty"`
 	// indexedStoredGameList 定义了所有的 StoredGame
 	IndexedStoredGameList []*IndexedStoredGame `protobuf:"bytes,2,rep,name=indexedStoredGameList,proto3" json:"indexedStoredGameList,omitempty"`
+	// 用于测试 BeginBlocker 函数的测试字段
+	RecordList []string `protobuf:"bytes,3,rep,name=recordList,proto3" json:"recordList,omitempty"`
 }
 
 func (x *GenesisState) Reset() {
@@ -2136,6 +2262,13 @@ func (x *GenesisState) GetParams() *Params {
 func (x *GenesisState) GetIndexedStoredGameList() []*IndexedStoredGame {
 	if x != nil {
 		return x.IndexedStoredGameList
+	}
+	return nil
+}
+
+func (x *GenesisState) GetRecordList() []string {
+	if x != nil {
+		return x.RecordList
 	}
 	return nil
 }
@@ -2258,7 +2391,7 @@ var file_buzzing_checkers_v1_types_proto_rawDesc = []byte{
 	0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x63, 0x6f, 0x73, 0x6d, 0x6f, 0x73, 0x2e, 0x70, 0x72, 0x6f, 0x74,
 	0x6f, 0x1a, 0x14, 0x67, 0x6f, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x2f, 0x67, 0x6f, 0x67,
 	0x6f, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x22, 0x08, 0x0a, 0x06, 0x50, 0x61, 0x72, 0x61, 0x6d,
-	0x73, 0x22, 0xad, 0x01, 0x0a, 0x0c, 0x47, 0x65, 0x6e, 0x65, 0x73, 0x69, 0x73, 0x53, 0x74, 0x61,
+	0x73, 0x22, 0xcd, 0x01, 0x0a, 0x0c, 0x47, 0x65, 0x6e, 0x65, 0x73, 0x69, 0x73, 0x53, 0x74, 0x61,
 	0x74, 0x65, 0x12, 0x39, 0x0a, 0x06, 0x70, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x18, 0x01, 0x20, 0x01,
 	0x28, 0x0b, 0x32, 0x1b, 0x2e, 0x62, 0x75, 0x7a, 0x7a, 0x69, 0x6e, 0x67, 0x2e, 0x63, 0x68, 0x65,
 	0x63, 0x6b, 0x65, 0x72, 0x73, 0x2e, 0x76, 0x31, 0x2e, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x73, 0x42,
@@ -2269,6 +2402,8 @@ var file_buzzing_checkers_v1_types_proto_rawDesc = []byte{
 	0x76, 0x31, 0x2e, 0x49, 0x6e, 0x64, 0x65, 0x78, 0x65, 0x64, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x64,
 	0x47, 0x61, 0x6d, 0x65, 0x42, 0x04, 0xc8, 0xde, 0x1f, 0x00, 0x52, 0x15, 0x69, 0x6e, 0x64, 0x65,
 	0x78, 0x65, 0x64, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x64, 0x47, 0x61, 0x6d, 0x65, 0x4c, 0x69, 0x73,
+	0x74, 0x12, 0x1e, 0x0a, 0x0a, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x4c, 0x69, 0x73, 0x74, 0x18,
+	0x03, 0x20, 0x03, 0x28, 0x09, 0x52, 0x0a, 0x72, 0x65, 0x63, 0x6f, 0x72, 0x64, 0x4c, 0x69, 0x73,
 	0x74, 0x22, 0x92, 0x01, 0x0a, 0x0a, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x64, 0x47, 0x61, 0x6d, 0x65,
 	0x12, 0x14, 0x0a, 0x05, 0x62, 0x6f, 0x61, 0x72, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52,
 	0x05, 0x62, 0x6f, 0x61, 0x72, 0x64, 0x12, 0x12, 0x0a, 0x04, 0x74, 0x75, 0x72, 0x6e, 0x18, 0x02,

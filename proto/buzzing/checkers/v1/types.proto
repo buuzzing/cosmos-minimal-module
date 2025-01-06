@@ -15,6 +15,8 @@ message GenesisState {
     Params params = 1 [(gogoproto.nullable) = false];
     // indexedStoredGameList 定义了所有的 StoredGame
     repeated IndexedStoredGame indexedStoredGameList = 2 [(gogoproto.nullable) = false];
+    // 用于测试 BeginBlocker 函数的测试字段
+    repeated string recordList = 3;
 }
 
 // StoredGame 为一局游戏进行到某一步时的状态

@@ -10,7 +10,6 @@ package keeper
 
 import (
 	"context"
-
 	"github.com/buzzing/checkers"
 )
 
@@ -26,6 +25,12 @@ func (k *Keeper) InitGenesis(ctx context.Context, data *checkers.GenesisState) e
 	// 参见 keeper/keeper.go 中的 StoredGame 字段
 	for _, indexedStoredGame := range data.IndexedStoredGameList {
 		if err := k.StoredGames.Set(ctx, indexedStoredGame.Index, indexedStoredGame.StoredGame); err != nil {
+			return err
+		}
+	}
+
+	for _, record := range data.RecordList {
+		if err := k.RecordList.Set(ctx, record); err != nil {
 			return err
 		}
 	}
@@ -55,8 +60,17 @@ func (k *Keeper) ExportGenesis(ctx context.Context) (*checkers.GenesisState, err
 		return nil, err
 	}
 
+	var recordList []string
+	if err := k.RecordList.Walk(ctx, nil, func(record string) (bool, error) {
+		recordList = append(recordList, record)
+		return false, nil
+	}); err != nil {
+		return nil, err
+	}
+
 	return &checkers.GenesisState{
 		Params:                params,
 		IndexedStoredGameList: indexedStoredGames,
+		RecordList:            recordList,
 	}, nil
 }

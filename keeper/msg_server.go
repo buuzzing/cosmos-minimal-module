@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"github.com/buzzing/checkers"
 	"github.com/buzzing/checkers/rules"
+	"strings"
 )
 
 type msgServer struct {
@@ -47,4 +48,20 @@ func (ms msgServer) CreateGame(ctx context.Context, msg *checkers.MsgCreateGame)
 	}
 
 	return &checkers.MsgCreateGameResponse{}, nil
+}
+
+// AddRecord MsgAddRecord 消息的 handler，将记录添加到链上存储中
+func (ms msgServer) AddRecord(ctx context.Context, msg *checkers.MsgAddRecord) (*checkers.MsgAddRecordResponse, error) {
+	// 手动设置一个错误触发条件
+	// 如果 record 中包含单词 "Monday" 则返回错误
+	if strings.Contains(msg.Value, "Monday") {
+		return nil, fmt.Errorf("cannot add record with value %s", msg.Value)
+	}
+
+	// 存储状态
+	if err := ms.k.RecordList.Set(ctx, msg.Value); err != nil {
+		return nil, err
+	}
+
+	return &checkers.MsgAddRecordResponse{}, nil
 }

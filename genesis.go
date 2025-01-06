@@ -10,8 +10,10 @@
 package checkers
 
 func NewGenesisState() *GenesisState {
+	record := GetFormatDates() + " by genesis state"
 	return &GenesisState{
-		Params: DefaultParams(),
+		Params:     DefaultParams(),
+		RecordList: []string{record},
 	}
 }
 
@@ -36,6 +38,11 @@ func (gs *GenesisState) Validate() error {
 			return err
 		}
 		unique[indexedStoredGame.Index] = true
+	}
+
+	// RecordList 初始只包含一个由模块生成的记录
+	if len(gs.RecordList) != 1 {
+		return ErrRecordListSpecified
 	}
 
 	return nil
