@@ -32,6 +32,10 @@ var (
 
 	// AppModule 不包含功能，模块通过实现 AppModule 接口来被其他模块注入
 	_ appmodule.AppModule = AppModule{}
+	// 包含 BeginBlock 方法
+	_ appmodule.HasBeginBlocker = AppModule{}
+	// 包含 EndBlock 方法
+	_ appmodule.HasEndBlocker = AppModule{}
 )
 
 // ConsensusVersion 定义当前模块的共识版本
@@ -141,4 +145,26 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 	}
 
 	return cdc.MustMarshalJSON(gs)
+}
+
+func (am AppModule) BeginBlock(goCtx context.Context) error {
+	sdkCtx := sdk.UnwrapSDKContext(goCtx)
+	height := sdkCtx.BlockHeight()
+	record := fmt.Sprintf("%s by BeginBlocker at %d", checkers.GetFormatDates(), height)
+	err := am.keeper.RecordList.Set(goCtx, record)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (am AppModule) EndBlock(goCtx context.Context) error {
+	sdkCtx := sdk.UnwrapSDKContext(goCtx)
+	height := sdkCtx.BlockHeight()
+	record := fmt.Sprintf("%s by EndBlocker at %d", checkers.GetFormatDates(), height)
+	err := am.keeper.RecordList.Set(goCtx, record)
+	if err != nil {
+		return err
+	}
+	return nil
 }
