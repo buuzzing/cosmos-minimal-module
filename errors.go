@@ -13,3 +13,7 @@ var (
 var (
 	ErrRecordListSpecified = errors.Register(ModuleName, 7, "record list specified")
 )
+
+var (
+	ErrInvalidVersion = errors.Register(ModuleName, 1500, "invalid version")
+)

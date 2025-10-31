@@ -11,12 +11,18 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
+	ibcporttypes "github.com/cosmos/ibc-go/v8/modules/core/05-port/types"
+	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 
 	modulev1 "github.com/buzzing/checkers/api/module/v1"
 	"github.com/buzzing/checkers/keeper"
 )
 
 var _ appmodule.AppModule = AppModule{}
+
+// 确保 AppModule 实现了 porttypes.IBCModule 接口
+var _ ibcporttypes.IBCModule = AppModule{}
 
 // IsOnePerModuleType() 和 IsAppModule() 是标记方法，没有具体逻辑
 // 只是用来告知 depinject 这是一个标准模块类型
@@ -53,6 +59,10 @@ type ModuleInputs struct {
 
 	// Config 模块配置信息，模块的元数据
 	Config *modulev1.Module
+
+	// IBC 相关依赖
+	IBCKeeperFn        func() *ibckeeper.Keeper                   `optional:"true"`
+	CapabilityScopedFn func(string) capabilitykeeper.ScopedKeeper `optional:"true"`
 }
 
 // ModuleOutputs 模块的输出参数
@@ -80,7 +90,10 @@ func ProvideModule(in ModuleInputs) ModuleOutputs {
 		in.Cdc,
 		in.AddressCodec,
 		in.StoreService,
-		authority.String())
+		authority.String(),
+		in.IBCKeeperFn,
+		in.CapabilityScopedFn,
+	)
 	m := NewAppModule(in.Cdc, k)
 
 	return ModuleOutputs{Module: m, Keeper: k}

@@ -9,7 +9,16 @@ package checkers
 
 import "cosmossdk.io/collections"
 
-const ModuleName = "checkers"
+const (
+	// ModuleName 定义模块的名称
+	ModuleName = "checkers"
+
+	// Version 定义 IBC 模块支持的版本
+	Version = "checkers-1"
+
+	// PortId 定义模块的默认绑定端口
+	PortId = "checkers"
+)
 
 // MaxIndexLength 定义游戏状态索引的最大长度
 const MaxIndexLength = 256

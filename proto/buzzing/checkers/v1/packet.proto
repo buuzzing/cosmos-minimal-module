@@ -1,0 +1,18 @@
+// packet.proto 文件定义了通过 IBC 模块传输的消息格式
+syntax = "proto3";
+package buzzing.checkers.v1;
+
+option go_package = "github.com/buzzing/checkers";
+
+import "gogoproto/gogo.proto";
+
+// RecordPacketData IBC 发送的消息格式
+message RecordPacketData {
+    string record_data = 1;
+    string sender = 2;
+}
+
+// RecordPacketAck IBC 消息的确认格式
+message RecordPacketAck {
+    string result = 1;
+}

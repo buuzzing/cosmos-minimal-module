@@ -21,6 +21,12 @@ import (
 	storetypes "cosmossdk.io/core/store"
 	"github.com/buzzing/checkers"
 	"github.com/cosmos/cosmos-sdk/codec"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	capabilitykeeper "github.com/cosmos/ibc-go/modules/capability/keeper"
+	capabilitytypes "github.com/cosmos/ibc-go/modules/capability/types"
+	host "github.com/cosmos/ibc-go/v8/modules/core/24-host"
+	"github.com/cosmos/ibc-go/v8/modules/core/exported"
+	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 
 	// collections 是 cosmos SDK 提供的一个存储抽象层，提供了更高级和
 	// 类型安全的存储接口，以替代传统的 KVStore 操作
@@ -54,10 +60,30 @@ type Keeper struct {
 
 	// 用于测试 BeginBlocker 函数的测试字段
 	RecordList collections.KeySet[string]
+
+	// IBC 相关 Keeper 字段
+	// IBC Keeper，包含 client, channel, port 等子 Keeper
+	ibcKeeperFn func() *ibckeeper.Keeper
+	// 在 Cosmos SDK 中，一个模块默认不能随意调用另一个模块的私有功能或访问其状态
+	// Capability 是一种安全机制，遵循 Object-Capability Model（对象能力模型）
+	// 核心思想为：仅仅“知道”一个资源的名字（例如 Port ID）并不足以使用它，还需要
+	// 持有一个代表访问该资源访问权的、不可伪造的“凭证”（Capability）
+	//   - 在创建 Port 时（BindPort 函数），将会生成一个 Capability
+	//   - 本模块必须把这个“钥匙”（Capability）存放在自己的“私人储物柜”中（ScopedKeeper）
+	//   - 每次访问该 Port，都必须出示这个“钥匙”，以证明自己有权访问
+	// ScopedKeeper 用于管理模块的 IBC 能力，管理端口和通道等
+	capabilityScopedFn func(string) capabilitykeeper.ScopedKeeper
 }
 
 // NewKeeper 创建一个新的 Keeper 实例
-func NewKeeper(cdc codec.BinaryCodec, addressCodec address.Codec, storeService storetypes.KVStoreService, authority string) Keeper {
+func NewKeeper(
+	cdc codec.BinaryCodec,
+	addressCodec address.Codec,
+	storeService storetypes.KVStoreService,
+	authority string,
+	ibcKeeperFn func() *ibckeeper.Keeper,
+	scopedKeeperFn func(string) capabilitykeeper.ScopedKeeper,
+) Keeper {
 	// 通过 addressCodec 检查 authority 是否是有效的地址
 	if _, err := addressCodec.StringToBytes(authority); err != nil {
 		panic(fmt.Errorf("invalid authority address: %w", err))
@@ -104,6 +130,9 @@ func NewKeeper(cdc codec.BinaryCodec, addressCodec address.Codec, storeService s
 		Params:      params,
 		StoredGames: storedGames,
 		RecordList:  recordList,
+
+		ibcKeeperFn:        ibcKeeperFn,
+		capabilityScopedFn: scopedKeeperFn,
 	}
 
 	// 通过 SchemaBuilder 构建模块的存储架构
@@ -122,4 +151,42 @@ func NewKeeper(cdc codec.BinaryCodec, addressCodec address.Codec, storeService s
 // GetAuthority 返回模块的权限账户地址
 func (k *Keeper) GetAuthority() string {
 	return k.authority
+}
+
+// --------------------------------------------------------------
+// IBC Keeper 相关逻辑
+// --------------------------------------------------------------
+
+// ClaimCapability 保存一个 Capability 到模块的 ScopedKeeper 中
+// 将一把“钥匙”（Capability）存入“私人储物柜”（ScopedKeeper）中
+// 并给它贴上一个“标签”（name），以便后续访问时使用
+// 通常用于收到一把新钥匙时调用：
+//   - BindPort 时，portKeeper.BindPort(...) 会创建并返回一把新的 Port 钥匙
+//     必须立即调用 ClaimCapability 来“认领”并存储它
+//   - OnChanOpenInit/OnChanOpenTry 时，IBC 模块在通道握手成功时，会产生一把该通道
+//     的 Channel 钥匙，同样需要调用 ClaimCapability 来存储它
+func (k *Keeper) ClaimCapability(
+	ctx sdk.Context,
+	cap *capabilitytypes.Capability,
+	name string,
+) error {
+	return k.ScopedKeeper().ClaimCapability(ctx, cap, name)
+}
+
+// AuthenticateCapability 用于向 ScopedKeeper 确认：之前存入的、标签为 name 的 Capability
+// 是否与当前提供的 cap 相匹配
+// 类似于出示钥匙以证明对某个资源（Port 或 Channel）的访问权限
+func (k *Keeper) AuthenticateCapability(ctx sdk.Context, cap *capabilitytypes.Capability, name string) bool {
+	return k.ScopedKeeper().AuthenticateCapability(ctx, cap, name)
+}
+
+// ScopedKeeper 返回模块的 ScopedKeeper
+func (k *Keeper) ScopedKeeper() exported.ScopedKeeper {
+	return k.capabilityScopedFn(checkers.ModuleName)
+}
+
+// BindPort 在模块创世时调用，绑定到指定的 portId
+func (k *Keeper) BindPort(ctx sdk.Context, portId string) error {
+	cap := k.ibcKeeperFn().PortKeeper.BindPort(ctx, portId)
+	return k.ClaimCapability(ctx, cap, host.PortPath(portId))
 }
